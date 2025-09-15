@@ -7,3 +7,4 @@ colors = ["orange", "yellow", "green"]
 plt.pie(snack_scores, labels=slice_labels, colors=colors)
 plt.title("My favorite snacks")
 plt.savefig("fav-snacks.png")
+
