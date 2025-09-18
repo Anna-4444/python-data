@@ -2,7 +2,11 @@ import requests
 from bs4 import BeautifulSoup
 
 def get_soup(url):
-  r = requests.get(url)
+  headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                  "(KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
+  }
+  r = requests.get(url, headers=headers)
   r.raise_for_status()
   html = r.text.encode("utf-8")
   soup = BeautifulSoup(html, "html.parser")
@@ -18,6 +22,24 @@ def get_categories(url):
     data[category_name] = category_animals
   return data
 
+def get_animal(url):
+  soup = get_soup(url)
+  table = soup.find("table", {"class": "infobox biota"})
+  if not table:
+    return print("No Class Found")
+  rows = table.find_all("tr")
+  for row in rows:
+    if "Class:" in row.get_text():
+      animal_class = row.find("a").contents[0]
+      return animal_class
+
+
+
 category_data = get_categories("https://skillcrush.github.io/web-scraping-endangered-species/")
 
-print(category_data)
+animal_class = get_animal("https://en.wikipedia.org/wiki/Honey_badger")
+
+# print(category_data)
+
+print(animal_class)
+
