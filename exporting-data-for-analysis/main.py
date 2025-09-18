@@ -1,9 +1,14 @@
 import requests
 from bs4 import BeautifulSoup
+import json
 
 
 def get_soup(url):
-  r = requests.get(url)
+  headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                  "(KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
+  }
+  r = requests.get(url, headers=headers)
   r.raise_for_status()
   html = r.text.encode("utf-8")
   soup = BeautifulSoup(html, "html.parser")
@@ -28,21 +33,23 @@ def get_animal(url):
   for row in rows:
     if "Class:" in row.get_text():
       animal_class = row.find("a").contents[0]
-  return animal_class
-
+      return animal_class
 
 category_data = get_categories("https://skillcrush.github.io/web-scraping-endangered-species/")
 
-# print(category_data)
-
-# animal_class = get_animal("https://en.wikipedia.org/wiki/Honey_badger")
-
-# print(animal_class)
+collected_data = []
 
 for category in category_data:
   for animal in category_data[category]:
     animal_href = animal["href"]
-    # print(animal_href)
     animal_class = get_animal(animal_href)
-    print(animal_class)
-    print()
+    animal_name = animal.contents[0]
+    data = {
+      "Category": category,
+      "Animal Name": animal_name,
+      "Animal Class": animal_class
+    }
+    collected_data.append(data)
+
+with open("animal-data.json", "w") as file:
+  json.dump(collected_data, file)
